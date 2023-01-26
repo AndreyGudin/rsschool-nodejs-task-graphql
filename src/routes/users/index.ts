@@ -53,6 +53,27 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
+      const user = (await fastify.db.users.findOne({
+        key: "id",
+        equals: request.params.id,
+      })) as UserEntity;
+      const usersIdSubscribedTo = [...user.subscribedToUserIds];
+      const users = await Promise.all(usersIdSubscribedTo.map((userId) => {
+        return fastify.db.users.findOne({
+          key: "id",
+          equals: userId,
+        });
+      }));
+      users.forEach((user) => {
+        if (user) {
+          const id = user.subscribedToUserIds.indexOf(request.params.id);
+          if (id > -1) user.subscribedToUserIds.splice(id, 1);
+        }
+      });
+      await Promise.all(usersIdSubscribedTo.map((userId) => {
+        const userToChange = users.find((user) => user?.id === userId);
+        return fastify.db.users.change(userId, userToChange!);
+      }))
       const result = await fastify.db.users.delete(request.params.id);
       if (!result) reply.notFound();
       return result;
