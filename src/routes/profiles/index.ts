@@ -34,8 +34,15 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<ProfileEntity> {
-      const result = await fastify.db.profiles.create(request.body);
-      if (!result) reply.badRequest();
+      const memberType = await fastify.db.memberTypes.findOne({key:'id', equals: request.body.memberTypeId});
+      const profile = await fastify.db.profiles.findOne({key:'userId', equals:request.body.userId});
+      let result:ProfileEntity={} as ProfileEntity;
+      if (memberType && !profile) {
+        result = await fastify.db.profiles.create(request.body);
+        if (!result) reply.badRequest();
+      } else {
+        reply.badRequest();
+      }
       return result;
     }
   );
@@ -47,10 +54,15 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<ProfileEntity> {
-      const result = await fastify.db.profiles.delete(request.params.id);
-      if (!result) reply.notFound();
-      return result;
+    async function (request, reply): Promise<ProfileEntity | undefined> {
+      try {
+        const result = await fastify.db.profiles.delete(request.params.id);
+        if (!result) reply.notFound();
+        return result;
+      } catch (error) {
+        reply.badRequest();
+      }
+
     }
   );
 
@@ -62,10 +74,15 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<ProfileEntity> {
-      const result = await fastify.db.profiles.change(request.params.id, request.body);
-      if (!result) reply.badRequest();
-      return result;
+    async function (request, reply): Promise<ProfileEntity | undefined> {
+      try {
+        const result = await fastify.db.profiles.change(request.params.id, request.body);
+        if (!result) reply.badRequest();
+        return result;
+      } catch (error) {
+        reply.badRequest();
+      }
+
     }
   );
 };
