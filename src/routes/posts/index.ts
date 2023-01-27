@@ -48,10 +48,15 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<PostEntity> {
-      const result = await fastify.db.posts.delete(request.params.id);
-      if (!result) reply.notFound();
-      return result;
+    async function (request, reply): Promise<PostEntity | undefined> {
+      try {
+        const result = await fastify.db.posts.delete(request.params.id);
+        if (!result) reply.notFound();
+        return result;
+      } catch (error) {
+        reply.badRequest();
+      }
+
     }
   );
 
@@ -63,13 +68,18 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<PostEntity> {
-      const result = await fastify.db.posts.change(
-        request.params.id,
-        request.body
-      );
-      if (!result) reply.badRequest();
-      return result;
+    async function (request, reply): Promise<PostEntity | undefined> {
+      try {
+        const result = await fastify.db.posts.change(
+          request.params.id,
+          request.body
+        );
+        if (!result) reply.notFound();
+        return result;
+      } catch (error) {
+        reply.badRequest();
+      }
+      
     }
   );
 };
