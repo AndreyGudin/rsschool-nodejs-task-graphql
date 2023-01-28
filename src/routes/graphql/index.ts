@@ -85,7 +85,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
                 lastName: { type: GraphQLString},
                 email: { type: GraphQLString},
               },
-              resolve: function(parent, {firstName, lastName, email}) {
+              resolve: function(parent, {firstName, lastName, email}, contextValue) {
                 return fastify.db.users.create({firstName, lastName, email});
               }
 
@@ -95,7 +95,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         })
         
       });
-      return await graphql({ schema, source});
+      return await graphql({ schema, source, contextValue: fastify});
     }
   );
 };
