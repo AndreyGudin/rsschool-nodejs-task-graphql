@@ -50,7 +50,28 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
               resolve(parent, args) {
                 return fastify.db.users.findOne({key:'id', equals: args.id})
               }
-            }
+            },
+            profile: {
+              type: Profile,
+              args: { id: { type: GraphQLID}},
+              resolve(parent, args) {
+                return fastify.db.profiles.findOne({key:'id', equals: args.id})
+              }
+            },
+            post: {
+              type: Post,
+              args: { id: { type: GraphQLID}},
+              resolve(parent, args) {
+                return fastify.db.posts.findOne({key:'id', equals: args.id})
+              }
+            },
+            memberType: {
+              type: MemberTypes,
+              args: { id: { type: GraphQLID}},
+              resolve(parent, args) {
+                return fastify.db.memberTypes.findOne({key:'id', equals: args.id})
+              }
+            },
           }
         }
         ),
