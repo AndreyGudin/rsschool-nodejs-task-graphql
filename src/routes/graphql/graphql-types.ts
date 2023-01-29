@@ -5,6 +5,7 @@ import {
   GraphQLID,
   GraphQLInt,
 } from "graphql";
+import { FastifyType } from ".";
 
 const Profile = new GraphQLObjectType({
   name: "Profile",
@@ -40,41 +41,49 @@ const MemberTypes = new GraphQLObjectType({
   },
 });
 
-const User = new GraphQLObjectType({
+const User:GraphQLObjectType = new GraphQLObjectType({
   name: "User",
-  fields: {
-    id: { type: GraphQLID },
-    firstName: { type: GraphQLString },
-    lastName: { type: GraphQLString },
-    email: { type: GraphQLString },
-    subscribedToUserIds: { type: new GraphQLList(GraphQLString) },
-    profile: {
-      type: Profile,
-      resolve(parent, args, contextValue) {
-        return contextValue.db.profiles.findOne({
-          key: "userId",
-          equals: parent.id,
-        });
+  fields: () => {
+    return {
+      id: { type: GraphQLID },
+      firstName: { type: GraphQLString },
+      lastName: { type: GraphQLString },
+      email: { type: GraphQLString },
+      subscribedToUserIds: { type: new GraphQLList(GraphQLString) },
+      subscribedToUser: {
+        type: new GraphQLList(User),
+        resolve: function(parent, args, contextValue: FastifyType) {
+          return parent.subscribedToUserIds;
+        }
       },
-    },
-    posts: {
-      type: new GraphQLList(Post),
-      resolve(parent, args, contextValue) {
-        return contextValue.db.posts.findOne({
-          key: "userId",
-          equals: parent.id,
-        });
+      profile: {
+        type: Profile,
+        resolve(parent, args, contextValue: FastifyType) {
+          return contextValue.db.profiles.findOne({
+            key: "userId",
+            equals: parent.id,
+          });
+        },
       },
-    },
-    memberTypes: {
-      type: MemberTypes,
-      resolve(parent, args, contextValue) {
-        return contextValue.db.memberTypes.findOne({
-          key: "userId",
-          equals: parent.id,
-        });
+      posts: {
+        type: new GraphQLList(Post),
+        resolve(parent, args, contextValue: FastifyType) {
+          return contextValue.db.posts.findOne({
+            key: "userId",
+            equals: parent.id,
+          });
+        },
       },
-    }
+      memberType: {
+        type: MemberTypes,
+        resolve(parent, args, contextValue: FastifyType) {
+          return contextValue.db.memberTypes.findOne({
+            key: "id",
+            equals: parent.id,
+          });
+        },
+      },
+    };
   },
 });
 
