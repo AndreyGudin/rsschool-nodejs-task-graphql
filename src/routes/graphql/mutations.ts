@@ -27,6 +27,15 @@ const ProfileInput = new GraphQLInputObjectType({
   }
 })
 
+const PostInput = new GraphQLInputObjectType({
+  name: "PostInput",
+  fields: {
+    title: { type: new GraphQLNonNull(GraphQLString) },
+    content: { type: new GraphQLNonNull(GraphQLString) },
+    userId: { type: new GraphQLNonNull(GraphQLID) },
+  },
+});
+
 export default new GraphQLObjectType({
   name: "Mutations",
   fields: {
@@ -79,16 +88,16 @@ export default new GraphQLObjectType({
     createPost: {
       type: Post,
       args: {
-        title: { type: GraphQLString },
-        content: { type: GraphQLString },
-        userId: { type: GraphQLID },
+        input: {
+          type: new GraphQLNonNull(PostInput)
+        }
       },
       resolve: function (
         parent,
-        { title, content, userId },
+        { input },
         contextValue: FastifyType
       ) {
-        return contextValue.db.posts.create({ title, content, userId });
+        return contextValue.db.posts.create(input);
       },
     },
   },
