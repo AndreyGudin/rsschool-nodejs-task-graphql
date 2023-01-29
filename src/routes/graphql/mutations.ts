@@ -13,6 +13,20 @@ const UserInput = new GraphQLInputObjectType({
     }
 })
 
+const ProfileInput = new GraphQLInputObjectType({
+  name: "ProfileInput",
+  fields: {
+    avatar: { type: new GraphQLNonNull(GraphQLString) },
+    sex: { type: new GraphQLNonNull(GraphQLString) },
+    birthday: { type: new GraphQLNonNull(GraphQLString) },
+    country: { type: new GraphQLNonNull(GraphQLString) },
+    street: { type: new GraphQLNonNull(GraphQLString) },
+    city: { type: new GraphQLNonNull(GraphQLString) },
+    memberTypeId: { type: new GraphQLNonNull(GraphQLString)},
+    userId: { type: new GraphQLNonNull(GraphQLID) },
+  }
+})
+
 export default new GraphQLObjectType({
   name: "Mutations",
   fields: {
@@ -35,41 +49,26 @@ export default new GraphQLObjectType({
     createProfile: {
       type: Profile,
       args: {
-        avatar: { type: GraphQLString },
-        sex: { type: GraphQLString },
-        birthday: { type: GraphQLString },
-        country: { type: GraphQLString },
-        street: { type: GraphQLString },
-        city: { type: GraphQLString },
-        memberTypeId: { type: GraphQLString },
-        userId: { type: GraphQLID },
+        input: {
+          type: new GraphQLNonNull(ProfileInput)
+        }
       },
       resolve: async function (
         parent,
-        { avatar, sex, birthday, country, street, city, memberTypeId, userId },
+        { input },
         contextValue: FastifyType
       ) {
-        const body = {
-          avatar,
-          sex,
-          birthday,
-          country,
-          street,
-          city,
-          memberTypeId,
-          userId,
-        };
         const memberType = await contextValue.db.memberTypes.findOne({
           key: "id",
-          equals: memberTypeId,
+          equals: input.memberTypeId,
         });
         const profile = await contextValue.db.profiles.findOne({
           key: "userId",
-          equals: userId,
+          equals: input.userId,
         });
         let result: ProfileEntity = {} as ProfileEntity;
         if (memberType && !profile) {
-          result = await contextValue.db.profiles.create(body);
+          result = await contextValue.db.profiles.create(input);
           if (!result) return;
         } else {
           return;
