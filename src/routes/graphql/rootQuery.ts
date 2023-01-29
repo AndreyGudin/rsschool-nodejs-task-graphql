@@ -6,30 +6,31 @@ import {
 
 import { User, Profile, Post, MemberTypes } from './graphql-types';
 
-export default new GraphQLObjectType({
+const rootQuery =  new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
     users: {
       type: new GraphQLList(User),
-      resolve(contextValue) {
+      resolve: function(parent, args, contextValue) {
+        console.log("contextValue",contextValue);
         return contextValue.db.users.findMany();
       }
     },
     profiles: {
       type: new GraphQLList(Profile),
-      resolve(contextValue) {
+      resolve(parent, args, contextValue) {
         return contextValue.db.profiles.findMany();
       }
     },
     posts: {
       type: new GraphQLList(Post),
-      resolve(contextValue) {
+      resolve(parent, args, contextValue) {
         return contextValue.db.posts.findMany();
       }
     },
     memberTypes: {
       type: new GraphQLList(MemberTypes),
-      resolve(contextValue) {
+      resolve(parent, args, contextValue) {
         return contextValue.db.memberTypes.findMany();
       }
     },
@@ -64,3 +65,5 @@ export default new GraphQLObjectType({
   }
 }
 )
+
+export default rootQuery;

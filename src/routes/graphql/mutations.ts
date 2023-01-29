@@ -3,7 +3,7 @@ import {
   GraphQLString,
 } from "graphql";
 
-import { User, Profile, Post, MemberTypes } from './graphql-types';
+import { User } from './graphql-types';
 
 export default new GraphQLObjectType({
   name: 'Mutations',
@@ -16,10 +16,10 @@ export default new GraphQLObjectType({
         email: { type: GraphQLString},
       },
       resolve: function(parent, {firstName, lastName, email}, contextValue) {
+        console.log("contextValue",contextValue);
         return contextValue.db.users.create({firstName, lastName, email});
       }
 
     }
-
   }
 })
