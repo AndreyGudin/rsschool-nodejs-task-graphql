@@ -1,9 +1,9 @@
 import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 import { graphqlBodySchema } from './schema';
-import { graphql, GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLID } from 'graphql';
+import { graphql, GraphQLSchema } from 'graphql';
 
-import { User, Profile, Post, MemberTypes } from './graphql-types';
 import rootQuery from './rootQuery';
+import mutations from './mutations';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -20,25 +20,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       console.log("source", source);
       const schema = new GraphQLSchema({
         query: rootQuery,
-        mutation: new GraphQLObjectType({
-          name: 'Mutations',
-          fields: {
-            createUser: {
-              type: User,
-              args: {
-                firstName: {type: GraphQLString},
-                lastName: { type: GraphQLString},
-                email: { type: GraphQLString},
-              },
-              resolve: function(parent, {firstName, lastName, email}, contextValue) {
-                return fastify.db.users.create({firstName, lastName, email});
-              }
-
-            }
-
-          }
-        })
-        
+        mutation: mutations
       });
       return await graphql({ schema, source, contextValue: fastify});
     }
