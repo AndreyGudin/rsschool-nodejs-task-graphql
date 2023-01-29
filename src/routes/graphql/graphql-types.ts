@@ -52,7 +52,7 @@ const User = new GraphQLObjectType({
       type: Profile,
       resolve(parent, args, contextValue) {
         return contextValue.db.profiles.findOne({
-          key: "id",
+          key: "userId",
           equals: parent.id,
         });
       },
@@ -61,7 +61,7 @@ const User = new GraphQLObjectType({
       type: new GraphQLList(Post),
       resolve(parent, args, contextValue) {
         return contextValue.db.posts.findOne({
-          key: "id",
+          key: "userId",
           equals: parent.id,
         });
       },
@@ -70,7 +70,7 @@ const User = new GraphQLObjectType({
       type: MemberTypes,
       resolve(parent, args, contextValue) {
         return contextValue.db.memberTypes.findOne({
-          key: "id",
+          key: "userId",
           equals: parent.id,
         });
       },
