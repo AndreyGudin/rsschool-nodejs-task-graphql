@@ -1,8 +1,17 @@
-import { GraphQLID, GraphQLObjectType, GraphQLString } from "graphql";
+import { GraphQLID, GraphQLInputObjectType, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
 
 import { FastifyType } from ".";
 import { ProfileEntity } from "../../utils/DB/entities/DBProfiles";
 import { Post, Profile, User } from "./graphql-types";
+
+const UserInput = new GraphQLInputObjectType({
+    name: "UserInput",
+    fields: {
+      firstName: { type: new GraphQLNonNull(GraphQLString) },
+      lastName: { type: new GraphQLNonNull(GraphQLString) },
+      email: { type: new GraphQLNonNull(GraphQLString) },
+    }
+})
 
 export default new GraphQLObjectType({
   name: "Mutations",
@@ -10,15 +19,16 @@ export default new GraphQLObjectType({
     createUser: {
       type: User,
       args: {
-        firstName: { type: GraphQLString },
-        lastName: { type: GraphQLString },
-        email: { type: GraphQLString },
+        input: {
+          type: new GraphQLNonNull(UserInput)
+        }
       },
       resolve: function (
         parent,
-        { firstName, lastName, email },
+        { input },
         contextValue: FastifyType
       ) {
+        const {firstName, lastName, email} = input;
         return contextValue.db.users.create({ firstName, lastName, email });
       },
     },
