@@ -38,6 +38,21 @@ const ProfileInput = new GraphQLInputObjectType({
   },
 });
 
+const ProfileUpdateInput = new GraphQLInputObjectType({
+  name: "ProfileUpdateInput",
+  fields: {
+    id:{ type: new GraphQLNonNull(GraphQLID) },
+    avatar: { type: GraphQLString },
+    sex: { type: GraphQLString },
+    birthday: { type: GraphQLString },
+    country: { type: GraphQLString },
+    street: { type: GraphQLString },
+    city: { type: GraphQLString },
+    memberTypeId: { type: GraphQLString },
+    userId: { type: GraphQLID },
+  },
+});
+
 const PostInput = new GraphQLInputObjectType({
   name: "PostInput",
   fields: {
@@ -47,4 +62,4 @@ const PostInput = new GraphQLInputObjectType({
   },
 });
 
-export { UserInput, ProfileInput, PostInput, UserUpdateInput };
+export { UserInput, ProfileInput, PostInput, UserUpdateInput, ProfileUpdateInput };

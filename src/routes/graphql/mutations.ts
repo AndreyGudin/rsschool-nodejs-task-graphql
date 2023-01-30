@@ -1,10 +1,11 @@
-import { GraphQLNonNull, GraphQLObjectType } from "graphql";
+import { GraphQLID, GraphQLNonNull, GraphQLObjectType } from "graphql";
 
 import { FastifyType } from ".";
 import { ProfileEntity } from "../../utils/DB/entities/DBProfiles";
 import {
   PostInput,
   ProfileInput,
+  ProfileUpdateInput,
   UserInput,
   UserUpdateInput,
 } from "./graphql-input-types";
@@ -65,16 +66,25 @@ export default new GraphQLObjectType({
     updateUser: {
       type: User,
       args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
         input: {
           type: new GraphQLNonNull(UserUpdateInput),
         },
       },
-      resolve: function (parent, { input }, contextValue: FastifyType) {
-        return contextValue.db.users.change(input.id, {
-          firstName: input.firstName,
-          lastName: input.lastName,
-          email: input.email,
-        });
+      resolve: function (parent, {id, input}, contextValue: FastifyType) {
+        return contextValue.db.users.change(id, input);
+      },
+    },
+    updateProfile: {
+      type: User,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        input: {
+          type: new GraphQLNonNull(ProfileUpdateInput),
+        },
+      },
+      resolve: function (parent, { id, input }, contextValue: FastifyType) {
+        return contextValue.db.profiles.change(id, input);
       },
     },
   },
