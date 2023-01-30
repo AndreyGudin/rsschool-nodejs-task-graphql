@@ -141,7 +141,7 @@ export default new GraphQLObjectType({
           });
           return result;
         };
-        const result = await subscribe(id, userId.userId);
+        const result:UserEntity = await subscribe(id, userId.userId);
         await subscribe(userId.userId, id);
         if (!result) return;
         return result;

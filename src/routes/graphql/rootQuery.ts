@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLList, GraphQLID } from 'graphql';
+import { GraphQLObjectType, GraphQLList, GraphQLID, GraphQLString } from 'graphql';
 
 import { User, Profile, Post, MemberTypes } from './graphql-types';
 
@@ -53,7 +53,7 @@ const rootQuery = new GraphQLObjectType({
     },
     memberType: {
       type: MemberTypes,
-      args: { id: { type: GraphQLID } },
+      args: { id: { type: GraphQLString } },
       resolve(parent, args, contextValue) {
         return contextValue.db.memberTypes.findOne({
           key: 'id',
