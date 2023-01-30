@@ -119,17 +119,20 @@ export default new GraphQLObjectType({
       type: User,
       args:{
         id: {type: new GraphQLNonNull(GraphQLID)},
-        userId: {type: new GraphQLNonNull(SubscribeToUserInput)}
+        input: {type: new GraphQLNonNull(SubscribeToUserInput)}
       },
-      resolve: async function(parent, { id, userId }, contextValue: FastifyType) {
+      resolve: async function(parent, { id, input:userId }, contextValue: FastifyType) {
         const subscribe = async (id: string, idToSubscribe: string) => {
           const user = (await contextValue.db.users.findOne({
             key: "id",
             equals: id,
           })) as UserEntity;
+          console.log("userId", userId.userId);
+          console.log("user", user);
           const result = await contextValue.db.users.change(id, {
             subscribedToUserIds: [...user.subscribedToUserIds, idToSubscribe],
           });
+          console.log("result", result);
           return result;
         };
         const result = await subscribe(id, userId);
