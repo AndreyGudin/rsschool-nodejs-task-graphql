@@ -37,7 +37,7 @@ const MemberTypes = new GraphQLObjectType({
   fields: {
     id: { type: GraphQLString },
     discount: { type: GraphQLInt },
-    monthPostsLimit: { type: GraphQLString },
+    monthPostsLimit: { type: GraphQLInt },
   },
 });
 

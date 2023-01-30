@@ -1,8 +1,9 @@
-import { GraphQLID, GraphQLNonNull, GraphQLObjectType } from "graphql";
+import { GraphQLID, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
 
 import { FastifyType } from ".";
 import { ProfileEntity } from "../../utils/DB/entities/DBProfiles";
 import {
+  MemberTypesUpdateInput,
   PostInput,
   PostUpdateInput,
   ProfileInput,
@@ -10,7 +11,7 @@ import {
   UserInput,
   UserUpdateInput,
 } from "./graphql-input-types";
-import { Post, Profile, User } from "./graphql-types";
+import { MemberTypes, Post, Profile, User } from "./graphql-types";
 
 export default new GraphQLObjectType({
   name: "Mutations",
@@ -98,6 +99,18 @@ export default new GraphQLObjectType({
       },
       resolve: function (parent, { id, input }, contextValue: FastifyType) {
         return contextValue.db.posts.change(id, input);
+      },
+    },
+    updateMemberTypes: {
+      type: MemberTypes,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) },
+        input: {
+          type: new GraphQLNonNull(MemberTypesUpdateInput),
+        },
+      },
+      resolve: function (parent, { id, input }, contextValue: FastifyType) {
+        return contextValue.db.memberTypes.change(id, input);
       },
     },
   },

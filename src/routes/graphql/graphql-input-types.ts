@@ -1,6 +1,7 @@
 import {
   GraphQLID,
   GraphQLInputObjectType,
+  GraphQLInt,
   GraphQLNonNull,
   GraphQLString,
 } from "graphql";
@@ -68,6 +69,14 @@ const PostUpdateInput = new GraphQLInputObjectType({
   },
 });
 
+const MemberTypesUpdateInput = new GraphQLInputObjectType({
+  name: "MemberTypesUpdateInput",
+  fields: {
+    discount: { type: GraphQLInt },
+    monthPostsLimit: { type: GraphQLInt },
+  },
+});
+
 export {
   UserInput,
   ProfileInput,
@@ -75,4 +84,5 @@ export {
   UserUpdateInput,
   ProfileUpdateInput,
   PostUpdateInput,
+  MemberTypesUpdateInput
 };
