@@ -142,9 +142,9 @@ export default new GraphQLObjectType({
       type: User,
       args:{
         id: {type: new GraphQLNonNull(GraphQLID)},
-        userId: {type: new GraphQLNonNull(SubscribeToUserInput)}
+        input: {type: new GraphQLNonNull(SubscribeToUserInput)}
       },
-      resolve: async function(parent, { id, userId }, contextValue: FastifyType) {
+      resolve: async function(parent, { id, input:userId }, contextValue: FastifyType) {
         const unsubscribe = async (id: string, idToSubscribe: string) => {
           const user = (await contextValue.db.users.findOne({
             key: "id",
@@ -160,8 +160,8 @@ export default new GraphQLObjectType({
           });
           return result;
         };
-        const result = await unsubscribe(id, userId);
-        await unsubscribe(userId, id);
+        const result = await unsubscribe(id, userId.userId);
+        await unsubscribe(userId.userId, id);
         if (!result) return;
         return result;
       }
