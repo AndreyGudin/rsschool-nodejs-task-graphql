@@ -4,6 +4,7 @@ import { FastifyType } from ".";
 import { ProfileEntity } from "../../utils/DB/entities/DBProfiles";
 import {
   PostInput,
+  PostUpdateInput,
   ProfileInput,
   ProfileUpdateInput,
   UserInput,
@@ -76,7 +77,7 @@ export default new GraphQLObjectType({
       },
     },
     updateProfile: {
-      type: User,
+      type: Profile,
       args: {
         id: { type: new GraphQLNonNull(GraphQLID) },
         input: {
@@ -85,6 +86,18 @@ export default new GraphQLObjectType({
       },
       resolve: function (parent, { id, input }, contextValue: FastifyType) {
         return contextValue.db.profiles.change(id, input);
+      },
+    },
+    updatePost: {
+      type: Post,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        input: {
+          type: new GraphQLNonNull(PostUpdateInput),
+        },
+      },
+      resolve: function (parent, { id, input }, contextValue: FastifyType) {
+        return contextValue.db.posts.change(id, input);
       },
     },
   },
