@@ -77,6 +77,13 @@ const MemberTypesUpdateInput = new GraphQLInputObjectType({
   },
 });
 
+const SubscribeToUserInput = new GraphQLInputObjectType({
+  name: "SubscribeToUserInput",
+  fields: {
+    userId: { type: new GraphQLNonNull(GraphQLID) },
+  },
+});
+
 export {
   UserInput,
   ProfileInput,
@@ -84,5 +91,6 @@ export {
   UserUpdateInput,
   ProfileUpdateInput,
   PostUpdateInput,
-  MemberTypesUpdateInput
+  MemberTypesUpdateInput,
+  SubscribeToUserInput,
 };

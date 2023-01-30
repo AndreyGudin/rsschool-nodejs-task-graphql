@@ -2,12 +2,14 @@ import { GraphQLID, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "gra
 
 import { FastifyType } from ".";
 import { ProfileEntity } from "../../utils/DB/entities/DBProfiles";
+import { UserEntity } from "../../utils/DB/entities/DBUsers";
 import {
   MemberTypesUpdateInput,
   PostInput,
   PostUpdateInput,
   ProfileInput,
   ProfileUpdateInput,
+  SubscribeToUserInput,
   UserInput,
   UserUpdateInput,
 } from "./graphql-input-types";
@@ -113,5 +115,56 @@ export default new GraphQLObjectType({
         return contextValue.db.memberTypes.change(id, input);
       },
     },
+    subscribeToUser: {
+      type: User,
+      args:{
+        id: {type: new GraphQLNonNull(GraphQLID)},
+        userId: {type: new GraphQLNonNull(SubscribeToUserInput)}
+      },
+      resolve: async function(parent, { id, userId }, contextValue: FastifyType) {
+        const subscribe = async (id: string, idToSubscribe: string) => {
+          const user = (await contextValue.db.users.findOne({
+            key: "id",
+            equals: id,
+          })) as UserEntity;
+          const result = await contextValue.db.users.change(id, {
+            subscribedToUserIds: [...user.subscribedToUserIds, idToSubscribe],
+          });
+          return result;
+        };
+        const result = await subscribe(id, userId);
+        await subscribe(userId, id);
+        if (!result) return;
+        return result;
+      }
+    },
+    unSubscribeFromUser:{
+      type: User,
+      args:{
+        id: {type: new GraphQLNonNull(GraphQLID)},
+        userId: {type: new GraphQLNonNull(SubscribeToUserInput)}
+      },
+      resolve: async function(parent, { id, userId }, contextValue: FastifyType) {
+        const unsubscribe = async (id: string, idToSubscribe: string) => {
+          const user = (await contextValue.db.users.findOne({
+            key: "id",
+            equals: id,
+          })) as UserEntity;
+          const indexToUnSubscribe =
+            user.subscribedToUserIds.indexOf(idToSubscribe);
+          if (indexToUnSubscribe === -1) return;
+          const subscriptions = [...user.subscribedToUserIds];
+          subscriptions.splice(indexToUnSubscribe, 1);
+          const result = await contextValue.db.users.change(id, {
+            subscribedToUserIds: [...subscriptions],
+          });
+          return result;
+        };
+        const result = await unsubscribe(id, userId);
+        await unsubscribe(userId, id);
+        if (!result) return;
+        return result;
+      }
+    }
   },
 });
