@@ -127,16 +127,13 @@ export default new GraphQLObjectType({
             key: "id",
             equals: id,
           })) as UserEntity;
-          console.log("userId", userId.userId);
-          console.log("user", user);
           const result = await contextValue.db.users.change(id, {
             subscribedToUserIds: [...user.subscribedToUserIds, idToSubscribe],
           });
-          console.log("result", result);
           return result;
         };
-        const result = await subscribe(id, userId);
-        await subscribe(userId, id);
+        const result = await subscribe(id, userId.userId);
+        await subscribe(userId.userId, id);
         if (!result) return;
         return result;
       }
