@@ -1,8 +1,13 @@
-import { GraphQLID, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
+import {
+  GraphQLID,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString,
+} from 'graphql';
 
-import { FastifyType } from ".";
-import { ProfileEntity } from "../../utils/DB/entities/DBProfiles";
-import { UserEntity } from "../../utils/DB/entities/DBUsers";
+import { FastifyType } from '.';
+import { ProfileEntity } from '../../utils/DB/entities/DBProfiles';
+import { UserEntity } from '../../utils/DB/entities/DBUsers';
 import {
   MemberTypesUpdateInput,
   PostInput,
@@ -12,11 +17,11 @@ import {
   SubscribeToUserInput,
   UserInput,
   UserUpdateInput,
-} from "./graphql-input-types";
-import { MemberTypes, Post, Profile, User } from "./graphql-types";
+} from './graphql-input-types';
+import { MemberTypes, Post, Profile, User } from './graphql-types';
 
 export default new GraphQLObjectType({
-  name: "Mutations",
+  name: 'Mutations',
   fields: {
     createUser: {
       type: User,
@@ -39,11 +44,11 @@ export default new GraphQLObjectType({
       },
       resolve: async function (parent, { input }, contextValue: FastifyType) {
         const memberType = await contextValue.db.memberTypes.findOne({
-          key: "id",
+          key: 'id',
           equals: input.memberTypeId,
         });
         const profile = await contextValue.db.profiles.findOne({
-          key: "userId",
+          key: 'userId',
           equals: input.userId,
         });
         let result: ProfileEntity = {} as ProfileEntity;
@@ -75,7 +80,7 @@ export default new GraphQLObjectType({
           type: new GraphQLNonNull(UserUpdateInput),
         },
       },
-      resolve: function (parent, {id, input}, contextValue: FastifyType) {
+      resolve: function (parent, { id, input }, contextValue: FastifyType) {
         return contextValue.db.users.change(id, input);
       },
     },
@@ -117,14 +122,18 @@ export default new GraphQLObjectType({
     },
     subscribeToUser: {
       type: User,
-      args:{
-        id: {type: new GraphQLNonNull(GraphQLID)},
-        input: {type: new GraphQLNonNull(SubscribeToUserInput)}
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        input: { type: new GraphQLNonNull(SubscribeToUserInput) },
       },
-      resolve: async function(parent, { id, input:userId }, contextValue: FastifyType) {
+      resolve: async function (
+        parent,
+        { id, input: userId },
+        contextValue: FastifyType
+      ) {
         const subscribe = async (id: string, idToSubscribe: string) => {
           const user = (await contextValue.db.users.findOne({
-            key: "id",
+            key: 'id',
             equals: id,
           })) as UserEntity;
           const result = await contextValue.db.users.change(id, {
@@ -136,18 +145,22 @@ export default new GraphQLObjectType({
         await subscribe(userId.userId, id);
         if (!result) return;
         return result;
-      }
-    },
-    unSubscribeFromUser:{
-      type: User,
-      args:{
-        id: {type: new GraphQLNonNull(GraphQLID)},
-        input: {type: new GraphQLNonNull(SubscribeToUserInput)}
       },
-      resolve: async function(parent, { id, input:userId }, contextValue: FastifyType) {
+    },
+    unSubscribeFromUser: {
+      type: User,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        input: { type: new GraphQLNonNull(SubscribeToUserInput) },
+      },
+      resolve: async function (
+        parent,
+        { id, input: userId },
+        contextValue: FastifyType
+      ) {
         const unsubscribe = async (id: string, idToSubscribe: string) => {
           const user = (await contextValue.db.users.findOne({
-            key: "id",
+            key: 'id',
             equals: id,
           })) as UserEntity;
           const indexToUnSubscribe =
@@ -164,7 +177,7 @@ export default new GraphQLObjectType({
         await unsubscribe(userId.userId, id);
         if (!result) return;
         return result;
-      }
-    }
+      },
+    },
   },
 });

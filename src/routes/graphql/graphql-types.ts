@@ -4,12 +4,12 @@ import {
   GraphQLList,
   GraphQLID,
   GraphQLInt,
-} from "graphql";
-import { PostEntity } from "../../utils/DB/entities/DBPosts";
-import { UserEntity } from "../../utils/DB/entities/DBUsers";
+} from 'graphql';
+import { PostEntity } from '../../utils/DB/entities/DBPosts';
+import { UserEntity } from '../../utils/DB/entities/DBUsers';
 
 const Profile = new GraphQLObjectType({
-  name: "Profile",
+  name: 'Profile',
   fields: {
     id: { type: GraphQLID },
     avatar: { type: GraphQLString },
@@ -24,7 +24,7 @@ const Profile = new GraphQLObjectType({
 });
 
 const Post = new GraphQLObjectType({
-  name: "Post",
+  name: 'Post',
   fields: {
     id: { type: GraphQLID },
     title: { type: GraphQLString },
@@ -34,7 +34,7 @@ const Post = new GraphQLObjectType({
 });
 
 const MemberTypes = new GraphQLObjectType({
-  name: "MemberTypes",
+  name: 'MemberTypes',
   fields: {
     id: { type: GraphQLString },
     discount: { type: GraphQLInt },
@@ -42,8 +42,8 @@ const MemberTypes = new GraphQLObjectType({
   },
 });
 
-const User:GraphQLObjectType = new GraphQLObjectType({
-  name: "User",
+const User: GraphQLObjectType = new GraphQLObjectType({
+  name: 'User',
   fields: () => {
     return {
       id: { type: GraphQLID },
@@ -53,49 +53,57 @@ const User:GraphQLObjectType = new GraphQLObjectType({
       subscribedToUserIds: { type: new GraphQLList(GraphQLString) },
       subscribedToUser: {
         type: new GraphQLList(User),
-        resolve: async function(parent, args, contextValue) {
-          const currentUser:UserEntity = await contextValue.db.users.findOne({key:'id', equals:parent.id});
-          const followedUsers:UserEntity[] = await Promise.all(currentUser.subscribedToUserIds.map((id) => {
-            return contextValue.db.users.findOne({key:'id', equals:id})
-          }))
+        resolve: async function (parent, args, contextValue) {
+          const currentUser: UserEntity = await contextValue.db.users.findOne({
+            key: 'id',
+            equals: parent.id,
+          });
+          const followedUsers: UserEntity[] = await Promise.all(
+            currentUser.subscribedToUserIds.map((id) => {
+              return contextValue.db.users.findOne({ key: 'id', equals: id });
+            })
+          );
           return followedUsers;
-        }
+        },
       },
       userSubscribedTo: {
         type: new GraphQLList(User),
         resolve: async function (parent, args, contextValue) {
-          const users:UserEntity[] = await contextValue.db.users.findMany();
+          const users: UserEntity[] = await contextValue.db.users.findMany();
           const result = users.filter((user) => user.id === parent.id);
           return result;
-        }
+        },
       },
       profile: {
         type: Profile,
         resolve(parent, args, contextValue) {
           return contextValue.db.profiles.findOne({
-            key: "userId",
+            key: 'userId',
             equals: parent.id,
           });
         },
       },
       posts: {
         type: new GraphQLList(Post),
-        resolve:async function(parent, args, contextValue) {
+        resolve: async function (parent, args, contextValue) {
           const posts = await contextValue.db.posts.findMany();
-          const result = posts.filter((post: PostEntity) => post.userId === parent.id);
+          const result = posts.filter(
+            (post: PostEntity) => post.userId === parent.id
+          );
           return result;
         },
       },
       memberType: {
         type: MemberTypes,
-        resolve: async function(parent, args, contextValue) {
-          const profile = await contextValue.db.profiles.findOne({key:'userId', equals:parent.id});
+        resolve: async function (parent, args, contextValue) {
+          const profile = await contextValue.db.profiles.findOne({
+            key: 'userId',
+            equals: parent.id,
+          });
           const memberType = await contextValue.db.memberTypes.findOne({
-            key: "id",
+            key: 'id',
             equals: profile?.memberTypeId,
           });
-          console.log("profile", profile);
-          console.log("memberType", memberType);
           return memberType;
         },
       },

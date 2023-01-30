@@ -4,10 +4,10 @@ import {
   GraphQLInt,
   GraphQLNonNull,
   GraphQLString,
-} from "graphql";
+} from 'graphql';
 
 const UserInput = new GraphQLInputObjectType({
-  name: "UserInput",
+  name: 'UserInput',
   fields: {
     firstName: { type: new GraphQLNonNull(GraphQLString) },
     lastName: { type: new GraphQLNonNull(GraphQLString) },
@@ -16,7 +16,7 @@ const UserInput = new GraphQLInputObjectType({
 });
 
 const UserUpdateInput = new GraphQLInputObjectType({
-  name: "UserUpdateInput",
+  name: 'UserUpdateInput',
   fields: {
     firstName: { type: GraphQLString },
     lastName: { type: GraphQLString },
@@ -25,7 +25,7 @@ const UserUpdateInput = new GraphQLInputObjectType({
 });
 
 const ProfileInput = new GraphQLInputObjectType({
-  name: "ProfileInput",
+  name: 'ProfileInput',
   fields: {
     avatar: { type: new GraphQLNonNull(GraphQLString) },
     sex: { type: new GraphQLNonNull(GraphQLString) },
@@ -39,7 +39,7 @@ const ProfileInput = new GraphQLInputObjectType({
 });
 
 const ProfileUpdateInput = new GraphQLInputObjectType({
-  name: "ProfileUpdateInput",
+  name: 'ProfileUpdateInput',
   fields: {
     avatar: { type: GraphQLString },
     sex: { type: GraphQLString },
@@ -53,7 +53,7 @@ const ProfileUpdateInput = new GraphQLInputObjectType({
 });
 
 const PostInput = new GraphQLInputObjectType({
-  name: "PostInput",
+  name: 'PostInput',
   fields: {
     title: { type: new GraphQLNonNull(GraphQLString) },
     content: { type: new GraphQLNonNull(GraphQLString) },
@@ -62,7 +62,7 @@ const PostInput = new GraphQLInputObjectType({
 });
 
 const PostUpdateInput = new GraphQLInputObjectType({
-  name: "PostUpdateInput",
+  name: 'PostUpdateInput',
   fields: {
     title: { type: GraphQLString },
     content: { type: GraphQLString },
@@ -70,7 +70,7 @@ const PostUpdateInput = new GraphQLInputObjectType({
 });
 
 const MemberTypesUpdateInput = new GraphQLInputObjectType({
-  name: "MemberTypesUpdateInput",
+  name: 'MemberTypesUpdateInput',
   fields: {
     discount: { type: GraphQLInt },
     monthPostsLimit: { type: GraphQLInt },
@@ -78,7 +78,7 @@ const MemberTypesUpdateInput = new GraphQLInputObjectType({
 });
 
 const SubscribeToUserInput = new GraphQLInputObjectType({
-  name: "SubscribeToUserInput",
+  name: 'SubscribeToUserInput',
   fields: {
     userId: { type: new GraphQLNonNull(GraphQLID) },
   },
