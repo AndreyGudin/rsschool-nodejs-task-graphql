@@ -6,6 +6,7 @@ import {
   GraphQLInt,
 } from "graphql";
 import { PostEntity } from "../../utils/DB/entities/DBPosts";
+import { UserEntity } from "../../utils/DB/entities/DBUsers";
 
 const Profile = new GraphQLObjectType({
   name: "Profile",
@@ -52,8 +53,20 @@ const User:GraphQLObjectType = new GraphQLObjectType({
       subscribedToUserIds: { type: new GraphQLList(GraphQLString) },
       subscribedToUser: {
         type: new GraphQLList(User),
-        resolve: function(parent, args, contextValue) {
-          return parent.subscribedToUserIds;
+        resolve: async function(parent, args, contextValue) {
+          const currentUser:UserEntity = await contextValue.db.users.findOne({key:'id', equals:parent.id});
+          const followedUsers:UserEntity[] = await Promise.all(currentUser.subscribedToUserIds.map((id) => {
+            return contextValue.db.users.findOne({key:'id', equals:id})
+          }))
+          return followedUsers;
+        }
+      },
+      userSubscribedTo: {
+        type: new GraphQLList(User),
+        resolve: async function (parent, args, contextValue) {
+          const users:UserEntity[] = await contextValue.db.users.findMany();
+          const result = users.filter((user) => user.id === parent.id);
+          return result;
         }
       },
       profile: {
