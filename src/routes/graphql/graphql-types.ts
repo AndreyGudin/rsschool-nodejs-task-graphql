@@ -5,7 +5,7 @@ import {
   GraphQLID,
   GraphQLInt,
 } from "graphql";
-import { FastifyType } from ".";
+import { PostEntity } from "../../utils/DB/entities/DBPosts";
 
 const Profile = new GraphQLObjectType({
   name: "Profile",
@@ -52,13 +52,13 @@ const User:GraphQLObjectType = new GraphQLObjectType({
       subscribedToUserIds: { type: new GraphQLList(GraphQLString) },
       subscribedToUser: {
         type: new GraphQLList(User),
-        resolve: function(parent, args, contextValue: FastifyType) {
+        resolve: function(parent, args, contextValue) {
           return parent.subscribedToUserIds;
         }
       },
       profile: {
         type: Profile,
-        resolve(parent, args, contextValue: FastifyType) {
+        resolve(parent, args, contextValue) {
           return contextValue.db.profiles.findOne({
             key: "userId",
             equals: parent.id,
@@ -67,20 +67,23 @@ const User:GraphQLObjectType = new GraphQLObjectType({
       },
       posts: {
         type: new GraphQLList(Post),
-        resolve(parent, args, contextValue: FastifyType) {
-          return contextValue.db.posts.findOne({
-            key: "userId",
-            equals: parent.id,
-          });
+        resolve:async function(parent, args, contextValue) {
+          const posts = await contextValue.db.posts.findMany();
+          const result = posts.filter((post: PostEntity) => post.userId === parent.id);
+          return result;
         },
       },
       memberType: {
         type: MemberTypes,
-        resolve(parent, args, contextValue: FastifyType) {
-          return contextValue.db.memberTypes.findOne({
+        resolve: async function(parent, args, contextValue) {
+          const profile = await contextValue.db.profiles.findOne({key:'userId', equals:parent.id});
+          const memberType = await contextValue.db.memberTypes.findOne({
             key: "id",
-            equals: parent.id,
+            equals: profile?.memberTypeId,
           });
+          console.log("profile", profile);
+          console.log("memberType", memberType);
+          return memberType;
         },
       },
     };
